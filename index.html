@@ -1,0 +1,519 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MosquitoMap | Environmental Monitoring</title>
+
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Leaflet Map -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">M</div>
+            <div>
+                <h2>MosquitoMap</h2>
+                <span>Environmental Intelligence</span>
+            </div>
+        </div>
+
+        <div class="menu-label">MENU UTAMA</div>
+
+        <nav class="navigation">
+            <a href="#dashboard" class="nav-link active">
+                <span>▦</span> Dashboard
+            </a>
+            <a href="#monitoring" class="nav-link">
+                <span>⌖</span> Peta Monitoring
+            </a>
+            <a href="#sensor" class="nav-link">
+                <span>◉</span> Data Sensor
+            </a>
+            <a href="#locations" class="nav-link">
+                <span>▤</span> Data Lokasi
+            </a>
+            <a href="#recommendations" class="nav-link">
+                <span>✧</span> Rekomendasi
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="system-status">
+                <span class="status-dot"></span>
+                <div>
+                    <strong>System Online</strong>
+                    <small>Demo Environment</small>
+                </div>
+            </div>
+
+            <div class="user-profile">
+                <div class="avatar">AD</div>
+                <div>
+                    <strong>Administrator</strong>
+                    <small>Environmental Manager</small>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- HEADER -->
+        <header class="topbar">
+            <div>
+                <div class="breadcrumb">Workspace / Dashboard</div>
+                <h1>Environmental Dashboard</h1>
+                <p>Pantau kondisi lingkungan dan potensi habitat perkembangbiakan nyamuk.</p>
+            </div>
+
+            <div class="topbar-actions">
+                <div class="date-display" id="currentDate">Memuat tanggal...</div>
+                <button class="refresh-button" id="refreshButton">
+                    ↻ Refresh Data
+                </button>
+            </div>
+        </header>
+
+        <!-- DASHBOARD -->
+        <section id="dashboard">
+
+            <div class="section-heading">
+                <div>
+                    <h2>Overview</h2>
+                    <p>Ringkasan kondisi lingkungan pada seluruh area pemantauan.</p>
+                </div>
+                <span class="demo-label">SIMULASI DATA</span>
+            </div>
+
+            <!-- STATISTICS -->
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span>Suhu Rata-rata</span>
+                        <div class="stat-icon green-icon">♨</div>
+                    </div>
+                    <div class="stat-value" id="averageTemperature">29.5°C</div>
+                    <div class="stat-description">Suhu lingkungan terpantau</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span>Kelembapan Rata-rata</span>
+                        <div class="stat-icon blue-icon">◉</div>
+                    </div>
+                    <div class="stat-value" id="averageHumidity">78%</div>
+                    <div class="stat-description">Kelembapan relatif udara</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span>Perangkat Aktif</span>
+                        <div class="stat-icon purple-icon">⌁</div>
+                    </div>
+                    <div class="stat-value" id="activeDevices">4 / 4</div>
+                    <div class="stat-description">Perangkat monitoring aktif</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span>Prioritas Tinggi</span>
+                        <div class="stat-icon red-icon">⚑</div>
+                    </div>
+                    <div class="stat-value" id="highPriority">1</div>
+                    <div class="stat-description">Lokasi perlu pemeriksaan</div>
+                </div>
+
+            </div>
+
+            <!-- MAP AND PRIORITY -->
+            <div class="content-grid" id="monitoring">
+
+                <div class="panel map-panel">
+                    <div class="panel-header map-header">
+                        <div>
+                            <h3>Peta Pemantauan Lingkungan</h3>
+                            <p>Distribusi titik lokasi monitoring.</p>
+                        </div>
+
+                        <div class="map-controls">
+                            <select id="priorityFilter">
+                                <option value="Semua">Semua Prioritas</option>
+                                <option value="Tinggi">Prioritas Tinggi</option>
+                                <option value="Sedang">Prioritas Sedang</option>
+                                <option value="Rendah">Prioritas Rendah</option>
+                            </select>
+
+                            <span class="live-indicator">
+                                <span></span> Monitoring
+                            </span>
+                        </div>
+                    </div>
+
+                    <div id="map"></div>
+
+                    <div class="map-legend">
+                        <span><i class="legend-dot low"></i> Rendah</span>
+                        <span><i class="legend-dot medium"></i> Sedang</span>
+                        <span><i class="legend-dot high"></i> Tinggi</span>
+                    </div>
+                </div>
+
+                <div class="panel priority-panel">
+                    <div class="panel-header">
+                        <div>
+                            <h3>Prioritas Lokasi</h3>
+                            <p>Hasil klasifikasi awal lingkungan.</p>
+                        </div>
+                    </div>
+
+                    <div id="priorityList" class="priority-list"></div>
+
+                    <div class="info-note">
+                        <strong>Catatan:</strong>
+                        Kategori prioritas merupakan indikasi kondisi lingkungan
+                        untuk menentukan kebutuhan pemeriksaan lapangan,
+                        bukan konfirmasi keberadaan jentik atau nyamuk.
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- DETAIL PERANGKAT -->
+            <div class="panel device-detail-panel" id="deviceDetail">
+                <div class="panel-header">
+                    <div>
+                        <h3>Detail Perangkat</h3>
+                        <p>Informasi perangkat yang dipilih pada peta.</p>
+                    </div>
+
+                    <span class="priority-badge badge-low" id="detailPriority">
+                        Belum dipilih
+                    </span>
+                </div>
+
+                <div class="detail-empty" id="detailEmpty">
+                    Pilih salah satu titik perangkat pada peta untuk melihat
+                    informasi lengkapnya.
+                </div>
+
+                <div class="device-detail-content" id="detailContent" hidden>
+                    <div class="detail-heading">
+                        <div>
+                            <span class="detail-id" id="detailId">MM-001</span>
+                            <h2 id="detailName">Nama Lokasi</h2>
+                        </div>
+                        <span class="device-status" id="detailStatus">● Aktif</span>
+                    </div>
+
+                    <div class="detail-grid">
+                        <div class="detail-card">
+                            <span>Suhu Lingkungan</span>
+                            <strong id="detailTemperature">--°C</strong>
+                        </div>
+
+                        <div class="detail-card">
+                            <span>Kelembapan Udara</span>
+                            <strong id="detailHumidity">--%</strong>
+                        </div>
+
+                        <div class="detail-card">
+                            <span>Latitude</span>
+                            <strong id="detailLatitude">--</strong>
+                        </div>
+
+                        <div class="detail-card">
+                            <span>Longitude</span>
+                            <strong id="detailLongitude">--</strong>
+                        </div>
+                    </div>
+
+                    <div class="environment-details">
+                        <h4>Observasi Lingkungan</h4>
+                        <div class="environment-grid">
+                            <div>
+                                <span>Genangan Air</span>
+                                <strong id="detailWater">--</strong>
+                            </div>
+                            <div>
+                                <span>Vegetasi</span>
+                                <strong id="detailVegetation">--</strong>
+                            </div>
+                            <div>
+                                <span>Drainase</span>
+                                <strong id="detailDrainage">--</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHART -->
+            <div class="panel chart-panel" id="sensor">
+                <div class="panel-header chart-heading">
+                    <div>
+                        <h3>Tren Kondisi Lingkungan</h3>
+                        <p>Perubahan suhu dan kelembapan berdasarkan data simulasi.</p>
+                    </div>
+
+                    <select id="chartPeriod">
+                        <option value="6">6 Periode</option>
+                        <option value="12">12 Periode</option>
+                    </select>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="environmentChart"></canvas>
+                </div>
+            </div>
+
+            <!-- LOCATION TABLE -->
+            <div class="panel table-panel" id="locations">
+                <div class="panel-header table-heading">
+                    <div>
+                        <h3>Data Lokasi Pemantauan</h3>
+                        <p>Informasi kondisi lingkungan pada setiap titik monitoring.</p>
+                    </div>
+
+                    <div class="table-actions">
+                        <input type="text" id="searchLocation"
+                            placeholder="Cari lokasi...">
+
+                        <button class="add-device-button" id="addDeviceButton">
+                            + Tambah Perangkat
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID Perangkat</th>
+                                <th>Lokasi</th>
+                                <th>Suhu</th>
+                                <th>Kelembapan</th>
+                                <th>Status Perangkat</th>
+                                <th>Prioritas</th>
+                                <th>Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="locationTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- RECOMMENDATIONS -->
+            <div class="panel recommendation-panel" id="recommendations">
+                <div class="panel-header">
+                    <div>
+                        <h3>Rekomendasi Tindakan</h3>
+                        <p>Langkah pemeriksaan berdasarkan indikasi kondisi lingkungan.</p>
+                    </div>
+                </div>
+
+                <div class="recommendation-list" id="recommendationList"></div>
+            </div>
+
+        </section>
+
+        <footer class="footer">
+            <span>© 2026 MosquitoMap. Environmental Monitoring Platform.</span>
+            <span>Version 1.0.0 | Demo Mode</span>
+        </footer>
+        <footer class="footer"></footer>
+
+        <!-- MODAL FORM PERANGKAT -->
+        <div class="modal-overlay" id="deviceModal">
+            <div class="modal-box">
+
+                <div class="modal-header">
+                    <div>
+                        <h3 id="modalTitle">Tambah Perangkat</h3>
+                        <p>Masukkan informasi perangkat dan lokasi pemantauan.</p>
+                    </div>
+
+                    <button class="close-modal" id="closeModalButton">
+                        &times;
+                    </button>
+                </div>
+
+                <form id="deviceForm">
+
+                    <div class="form-section-title">
+                        Informasi Perangkat
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="deviceId">ID Perangkat</label>
+                            <input type="text" id="deviceId"
+                                placeholder="Contoh: MM-005" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deviceName">Nama Lokasi</label>
+                            <input type="text" id="deviceName"
+                                placeholder="Contoh: Area Hutan B" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deviceLatitude">Latitude</label>
+                            <input type="number" id="deviceLatitude"
+                                step="any" placeholder="-6.2000" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deviceLongitude">Longitude</label>
+                            <input type="number" id="deviceLongitude"
+                                step="any" placeholder="106.8166" required>
+                        </div>
+                    </div>
+
+                    <div class="form-section-title">
+                        Data Sensor
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="deviceTemperature">Suhu (°C)</label>
+                            <input type="number" id="deviceTemperature"
+                                step="0.1" min="-40" max="80"
+                                placeholder="29.5" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deviceHumidity">Kelembapan (%)</label>
+                            <input type="number" id="deviceHumidity"
+                                step="1" min="0" max="100"
+                                placeholder="78" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deviceStatus">Status Perangkat</label>
+                            <select id="deviceStatus">
+                                <option value="Aktif">Aktif</option>
+                                <option value="Offline">Offline</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section-title">
+                        Observasi Lingkungan
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="deviceWater">Genangan Air</label>
+                            <select id="deviceWater">
+                                <option value="Tidak ditemukan">Tidak ditemukan</option>
+                                <option value="Ditemukan">Ditemukan</option>
+                                <option value="Belum diperiksa">Belum diperiksa</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deviceVegetation">Vegetasi</label>
+                            <select id="deviceVegetation">
+                                <option value="Rendah">Rendah</option>
+                                <option value="Sedang">Sedang</option>
+                                <option value="Lebat">Lebat</option>
+                                <option value="Belum diperiksa">Belum diperiksa</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deviceDrainage">Kondisi Drainase</label>
+                            <select id="deviceDrainage">
+                                <option value="Baik">Baik</option>
+                                <option value="Kurang baik">Kurang baik</option>
+                                <option value="Buruk">Buruk</option>
+                                <option value="Belum diperiksa">Belum diperiksa</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-button"
+                                id="cancelModalButton">
+                            Batal
+                        </button>
+
+                        <button type="submit" class="save-button">
+                            Simpan Perangkat
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+
+<!-- LOGIN MOSQUITOMAP -->
+<div id="authOverlay" class="auth-overlay">
+    <div class="auth-card">
+        <h2>MosquitoMap</h2>
+        <p>Silakan login untuk mengakses dashboard.</p>
+
+        <form id="loginForm">
+            <label for="loginEmail">Email</label>
+            <input
+                type="email"
+                id="loginEmail"
+                placeholder="Masukkan email"
+                required
+            >
+
+            <label for="loginPassword">Password</label>
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="Masukkan password"
+                required
+            >
+
+            <button type="submit" id="loginButton">
+                Login
+            </button>
+
+            <p id="loginError"></p>
+        </form>
+    </div>
+</div>
+
+<button id="logoutButton" class="logout-button" hidden>
+    Logout
+</button>
+
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- JavaScript Module -->
+<script type="module" src="js/script.js"></script>
+
+</body>
+</html>

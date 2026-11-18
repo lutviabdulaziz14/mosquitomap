@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "monitoring-galon-1f269",
+    "mosquitomap": "mosquitomap-b7810"
+  },
+  "targets": {},
+  "etags": {}
+}
