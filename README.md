@@ -1,1 +1,3 @@
-# mosquitomap
+# MosquitoMap
+
+Environmental Monitoring Website
